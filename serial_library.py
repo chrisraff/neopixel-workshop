@@ -2,14 +2,29 @@ import numpy as np
 from serial.tools.list_ports import comports
 import serial
 
-NUM_LEDS = 226
+WIDTH = 32*2
+HEIGHT = 8
+NUM_LEDS = WIDTH * HEIGHT
 
 # connect to the open serial port
 ports = list(map(lambda x: x[0], comports()))
+port_index = 0
+
 if len(ports) == 0:
 	print("couldn't find any open ports")
 	exit()
-ser = serial.Serial(ports[0], 115200, timeout=0.2)
+
+elif len(ports) > 1:
+	print("enter a number to choose a serial port")
+	print("======================================")
+	print("\n".join([f" [{i}] {x}" for i,x in enumerate(ports)]))
+	x = input()
+	assert x.isdigit(), "must specify a number"
+	x = int(x)
+	assert 0 <= x < len(ports), "number specified not in range"
+	port_index = x
+
+ser = serial.Serial(ports[port_index], 115200, timeout=0.2)
 
 
 
@@ -22,7 +37,7 @@ def write_channel(channel, values):
 
 
 def write(rgb):
-	NUM_LEDS = 226
+	# TODO increase dimensions (assert on the shape, don't check len)
 	if len(rgb) > NUM_LEDS:
 		print("ERROR: trying to write to too many LEDs")
 		rgb = rgb[:NUM_LEDS]
@@ -36,6 +51,7 @@ def write(rgb):
 		print("WARNING: values in array above 255")
 	rgb = np.clip(np.round(rgb), 0, 255).astype(np.int8)
 
+	# TODO switch to Arduino-Serial-Images method
 	ser.write( bytearray([0]+rgb[:,0].tolist()) )
 	ser.write( bytearray([1]+rgb[:,1].tolist()) )
 	ser.write( bytearray([2]+rgb[:,2].tolist()) )

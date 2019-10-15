@@ -1,28 +1,33 @@
 import time
-import sys
+from sys import argv as args
 import numpy as np
-from serial_library import write
+from serial_library import write, WIDTH, HEIGHT, NUM_LEDS
 from color_library import color_names, hsv2rgb
 
 
-NUM_LEDS = 226
+# TODO increase dimensions
 rgb = np.array([(255, 255, 255)]*NUM_LEDS)
+# rgb = np.zeros((WIDTH, HEIGHT, 3))
+# rgb = np.ones((WIDTH, HEIGHT, 3))*255
 
 
-# read in the color arguments
-args = sys.argv[1:]
+# non-animated demos (using arguments from the command line)
+args = args[1:]
 if len(args) == 1:
     color_name = args[0]
 
+    # if you run `python lights.py rainbow` it will show a rainbow
     if color_name == 'rainbow':
         rgb = np.array( [hsv2rgb(i/NUM_LEDS, 1, 1) for i in range(NUM_LEDS)] )
         # rgb = np.array( [hsv2rgb(((i*2)%NUM_LEDS)/NUM_LEDS, 1, 1) for i in range(NUM_LEDS)] )
         write(rgb)
 
+    # if you run `python lights.py green` it will set all the pixels to green
     elif color_name in color_names:
         rgb[:] = color_names[color_name]
         write(rgb)
 
+# arguments are a list of numbers, in the form "r g b r g b ..." where each triple of numbers is the color of the pixel
 elif len(args) > 0 and len(args) % 3 == 0:
     a = np.array(list(map(int, args))).reshape(-1,3)
     indexes = np.arange(NUM_LEDS)*a.shape[0]//NUM_LEDS
@@ -31,6 +36,7 @@ elif len(args) > 0 and len(args) % 3 == 0:
     write(rgb)
 
 else:
+    # animated demos
     def millis():
         return int(round(time.time() * 1000))
 
