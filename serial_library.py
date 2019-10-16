@@ -2,7 +2,7 @@ import numpy as np
 from serial.tools.list_ports import comports
 import serial
 
-WIDTH = 32*2
+WIDTH = 8
 HEIGHT = 8
 NUM_LEDS = WIDTH * HEIGHT
 
@@ -28,14 +28,6 @@ ser = serial.Serial(ports[port_index], 115200, timeout=0.2)
 
 
 
-def write_channel(channel, values):
-	if not 0 <= channel <= 2:
-		print("channel must be between 0 and 2")
-		exit()
-	output = bytearray([channel]+list(values))
-	ser.write(output)
-
-
 # input shape is (height, width, 3)
 def write(rgb_image):
 	pixel_count = rgb_image.shape[0] * rgb_image.shape[1]
@@ -52,7 +44,7 @@ def write(rgb_image):
 		print("WARNING: negative values in array")
 	if np.any(rgb > 255):
 		print("WARNING: values in array above 255")
-	rgb = np.clip(np.round(rgb), 0, 255).astype(np.int8)
+	rgb = np.clip(rgb, 0, 255).astype(np.uint8)
 
 	data = b'['
 
@@ -61,10 +53,9 @@ def write(rgb_image):
 	while written * 3 < len(rgb):
 		# check whether to write a group of 64 pixels or 1 pixel
 		if len(rgb) - written * 3 >= 64 * 3:
-			print("writing 64 pixels, delete line 64 of serial_library") # TODO delete after testing
 			data += b'.'
 			data += bytearray(rgb[written * 3 : (written + 64) * 3].tolist())
-			
+
 			written += 64
 		else:
 			data += b'>'
