@@ -36,12 +36,15 @@ def write_channel(channel, values):
 	ser.write(output)
 
 
-def write(rgb):
-	# TODO increase dimensions (assert on the shape, don't check len)
-	if len(rgb) > NUM_LEDS:
+# input shape is (height, width, 3)
+def write(rgb_image):
+	pixel_count = rgb_image.shape[0] * rgb_image.shape[1]
+	rgb = rgb_image.flatten()
+
+	if pixel_count > NUM_LEDS:
 		print("ERROR: trying to write to too many LEDs")
 		rgb = rgb[:NUM_LEDS]
-	if len(rgb) < NUM_LEDS:
+	if pixel_count < NUM_LEDS:
 		print("WARNING: trying to write to too few LEDs")
 		rgb = np.array([(255, 255, 255)]*NUM_LEDS)
 		rgb[0::2,:] = [255, 0, 0]
@@ -51,7 +54,24 @@ def write(rgb):
 		print("WARNING: values in array above 255")
 	rgb = np.clip(np.round(rgb), 0, 255).astype(np.int8)
 
-	# TODO switch to Arduino-Serial-Images method
-	ser.write( bytearray([0]+rgb[:,0].tolist()) )
-	ser.write( bytearray([1]+rgb[:,1].tolist()) )
-	ser.write( bytearray([2]+rgb[:,2].tolist()) )
+	data = b'['
+
+	# write pixels until every pixel has been sent
+	written = 0
+	while written * 3 < len(rgb):
+		# check whether to write a group of 64 pixels or 1 pixel
+		if len(rgb) - written * 3 >= 64 * 3:
+			print("writing 64 pixels, delete line 64 of serial_library") # TODO delete after testing
+			data += b'.'
+			data += bytearray(rgb[written * 3 : (written + 64) * 3].tolist())
+			
+			written += 64
+		else:
+			data += b'>'
+			data += bytearray(rgb[written * 3: written * 3 + 3].tolist())
+
+			written += 1
+	
+	data += b']'
+
+	ser.write(data)
