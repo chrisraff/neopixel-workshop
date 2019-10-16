@@ -14,7 +14,7 @@ leds = np.zeros((WIDTH, HEIGHT, 3))
 # variables for drawing logic go here
 
 # set a target framerate (max possible is around 60)
-fps = 30
+fps = 10
 # variables for framerate logic
 spf = 1 / fps
 last_draw_time = time()

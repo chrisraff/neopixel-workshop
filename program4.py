@@ -1,4 +1,4 @@
-# brightness as a function of position
+# blink when you press enter
 from serial_library import write, WIDTH, HEIGHT
 from color_library import color_names, hsv2rgb
 from time import time, sleep
@@ -11,7 +11,8 @@ import numpy as np
 # initialize led array
 leds = np.zeros((WIDTH, HEIGHT, 3))
 
-# variables for drawing logic go here
+# We'll be blinking, so we need to know if the lights are on or off
+lights_on = False
 
 # set a target framerate (max possible is around 60)
 fps = 10
@@ -30,12 +31,15 @@ while True:
     # DRAWING LOGIC GOES HERE
     #----------------------------------------
     
-    # set the color based on the (x, y) cordinate
-    for x in range(WIDTH):
-        for y in range(HEIGHT):
-            # the amount of red and green in the color will depend on where in the grid it is
-            leds[x, y] = (x, y, 0)
+    # wait until you press enter in the terminal
+    v = input()
 
+    if lights_on:
+        lights_on = False
+        leds[:, :] = (0, 0, 0)
+    else:
+        lights_on = True
+        leds[:, :] = (255, 0, 0)
 
     # END DRAWING LOGIC
 

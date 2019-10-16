@@ -1,4 +1,4 @@
-# brightness as a function of position
+# change brightness over time
 from serial_library import write, WIDTH, HEIGHT
 from color_library import color_names, hsv2rgb
 from time import time, sleep
@@ -11,7 +11,8 @@ import numpy as np
 # initialize led array
 leds = np.zeros((WIDTH, HEIGHT, 3))
 
-# variables for drawing logic go here
+# we need to keep track of which frame we're on
+brightness = 0
 
 # set a target framerate (max possible is around 60)
 fps = 10
@@ -29,13 +30,15 @@ while True:
     #----------------------------------------
     # DRAWING LOGIC GOES HERE
     #----------------------------------------
-    
-    # set the color based on the (x, y) cordinate
-    for x in range(WIDTH):
-        for y in range(HEIGHT):
-            # the amount of red and green in the color will depend on where in the grid it is
-            leds[x, y] = (x, y, 0)
 
+    # [:, :] assigns the same color to every LED in the array
+    leds[:, :] = (brightness, 0, 0)
+
+    # keep track of which frame it is
+    brightness += 6
+
+    # prevent brightness from going above the maximum value, 255
+    brightness = brightness % 256
 
     # END DRAWING LOGIC
 
