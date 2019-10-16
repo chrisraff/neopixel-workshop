@@ -1,3 +1,4 @@
+# turn a single light on
 from serial_library import write, WIDTH, HEIGHT
 from color_library import color_names, hsv2rgb
 from time import time, sleep
@@ -28,6 +29,12 @@ while True:
     #----------------------------------------
     # DRAWING LOGIC GOES HERE
     #----------------------------------------
+        
+    # set the led at location (0, 0) to red
+    leds[0, 0] = (255, 0, 0)
+
+    # alternatively, set the led by hue (h)
+    # leds[0, 0] = col.hsv2rgb(h=0, s=1, v=1)
 
     # END DRAWING LOGIC
 

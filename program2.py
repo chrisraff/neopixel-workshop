@@ -1,3 +1,4 @@
+# brightness as a function of position
 from serial_library import write, WIDTH, HEIGHT
 from color_library import color_names, hsv2rgb
 from time import time, sleep
@@ -28,6 +29,13 @@ while True:
     #----------------------------------------
     # DRAWING LOGIC GOES HERE
     #----------------------------------------
+    
+    # set the color based on the (x, y) cordinate
+    for x in range(WIDTH):
+        for y in range(HEIGHT):
+            # the amount of red and green in the color will depend on where in the grid it is
+            leds[x, y] = (x, y, 0)
+
 
     # END DRAWING LOGIC
 
