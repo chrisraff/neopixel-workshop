@@ -1,6 +1,6 @@
 # blink when you press enter
-from serial_library import write, WIDTH, HEIGHT
-from color_library import color_names, hsv2rgb
+from neopixel.serial_library import write, WIDTH, HEIGHT
+from neopixel.color_library import color_names, hsv2rgb
 from time import time, sleep
 import numpy as np
 
