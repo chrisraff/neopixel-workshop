@@ -65,4 +65,8 @@ def write(rgb_image):
 	
 	data += b']'
 
-	ser.write(data)
+	try:
+		ser.write(data)
+	except serial.serialutil.SerialException:
+		print("looks like the board was unplugged!")
+		exit()
